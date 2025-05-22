@@ -17,6 +17,8 @@ class ExpenseController extends Controller
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
+        $all_time_expense = Auth::user()->expenses()->sum('amount');
+        
         $all_expense_user = Auth::user()->expenses()
                                 ->orderBy('date', 'desc') // Sort by the date column in ascending/des order
                                 ->get();
@@ -76,7 +78,7 @@ class ExpenseController extends Controller
         $expensesData = $monthlyExpenses->pluck('total_amount');
 
         // Pass all the data to the view
-        return view('index', compact('all_expense_user','totalExpense', 'remaining', 'spendPercentage', 'trend', 'categories', 'amounts', 'months', 'expensesData'));
+        return view('home', compact('all_time_expense','all_expense_user','totalExpense', 'remaining', 'spendPercentage', 'trend', 'categories', 'amounts', 'months', 'expensesData'));
     }
 
      public function store(Request $request)
@@ -102,6 +104,15 @@ class ExpenseController extends Controller
         return redirect()->back()->with('success', 'Expense added successfully!');
     }
 
-
+    public function destroy($id)
+    {
+        $expense = Expense::where('id', $id)
+                    ->where('user_id', Auth::id()) // ensure user owns it
+                    ->firstOrFail();
+    
+        $expense->delete();
+    
+        return redirect()->back()->with('success', 'Expense deleted successfully!');
+    }
 
 }

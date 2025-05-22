@@ -1,25 +1,44 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExpenseController;
 
-Route::get('/register', function () {
-    return view('auth.register');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
 });
+Route::get('/download-apk', function () {
+    $filePath = public_path('expense_tracker_v2.apk');
 
-Route::get('/dashboard', [ExpenseController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    if (!file_exists($filePath)) {
+        abort(404, 'APK not found');
+    }
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
-    Route::post('/user/update-earnings', [ProfileController::class, 'updateEarnings'])->name('user.updateEarnings');
-    Route::get('/', [ExpenseController::class, 'index'])->name('index');
+    return response()->download($filePath, 'expense_tracker_v2.apk');
+})->name('download.apk');
 
-});
 
-require __DIR__.'/auth.php';
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/profile', 'ProfileController@index')->name('profile');
+Route::put('/profile', 'ProfileController@update')->name('profile.update');
+Route::post('/user/update-earnings', 'ProfileController@updateEarnings')->name('user.updateEarnings');
+Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');

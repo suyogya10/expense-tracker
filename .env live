@@ -1,9 +1,9 @@
 APP_NAME=ExpenseTracker
-APP_ENV=production
+APP_ENV=local
 APP_KEY=base64:C3JyTvFGTY8PKdzNSWMyf4UU+kv3UUpzEp6tevPg9AU=
-APP_DEBUG=false
+APP_DEBUG=true
 APP_TIMEZONE=UTC
-APP_URL=https://expensetracker.suyogyagautam.com.np/
+APP_URL=http://localhost
 
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
